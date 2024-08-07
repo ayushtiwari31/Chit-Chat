@@ -22,44 +22,73 @@ const Dashboard = () => {
 	const [message, setMessage] = useState('')
 	const [users, setUsers] = useState([])
 	const [socket, setSocket] = useState(null)
-  const [onlineUsers, setOnlineUsers] = useState({});
+  const [onlineUsers, setOnlineUsers] = useState(new Set());
 	const messageRef = useRef(null)
   const [userConversations, setUserConversations] = useState({});
 
+
+
+
+
+  // <----------------------------socket connection-----------------------------------------> 
 	useEffect(() => {
-		const socketInstance = io.connect('https://chit-chat-5-wnwg.onrender.com:8080',{
+		const socketInstance = io('http://localhost:8080',{
       reconnection:true,
-      withCredentials: true,
       extraHeaders: {
         "my-custom-header": "abcd"
       }
     });
         setSocket(socketInstance);
-
-       
-	}, [user])
+	}, [])
 
 
-
+  const usersSet = new Set();
     useEffect(() => {
       socket?.emit('addUser', user?.id);
       socket?.on('getUsers', users => {
+        
+
+        if (Array.isArray(users)) {
+          const usersSet = new Set();
+          for (const user of users) {
+            usersSet.add(String(user.userId)); // Ensure userId is a string
+          }
+          setOnlineUsers(usersSet);
+          console.log(usersSet);
+        }
+        
         console.log('activeUsers :>> ', users);
       });
+
+
       socket?.on('getMessage', data => {
         setMessages(prev => ({
           ...prev,
           messages: [...prev.messages, { user: data.user, message: data.message }]
         }));
       });
-    }, [socket]);
+
+
+    }, [socket, user?.id]);
     
 
+
+
+    // <---------------function to check user is online or offline ------------------------->
+    const isUserOnline= (userId) => {
+      const userIdStr = String(userId); 
+      return onlineUsers.has(userIdStr);
+    };
+
+
+
+
+    // <------------------------------fetching conversations-------------------------------------> 
   useEffect(() => {
     const loggedInUser = JSON.parse(localStorage.getItem('user:detail'));
     
     const fetchConversations = async () => {
-      const res = await fetch(`https://chit-chat-5-wnwg.onrender.com/api/conversations/${loggedInUser?.id}`, {
+      const res = await fetch(`http://localhost:8000/api/conversations/${loggedInUser?.id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -91,11 +120,14 @@ const Dashboard = () => {
         messageRef?.current?.scrollIntoView({ behavior: 'smooth' });
       }, [messages?.messages]);
     
-    //fetchinh all existing users
+
+
+
+    //<----------------------------fetchinh all existing users---------------------------------->
     useEffect(() => {
         const fetchUsers = async () => {
           try {
-            const res = await fetch(`https://chit-chat-5-wnwg.onrender.com/api/users/${user?.id}`, {
+            const res = await fetch(`http://localhost:8000/api/users/${user?.id}`, {
               method: 'GET',
               headers: {
                 'Content-Type': 'application/json',
@@ -109,27 +141,6 @@ const Dashboard = () => {
             }));
       
             setUsers(updatedUsers);
-            const initialOnlineUsers = {};
-            resData.forEach(userItem => {
-              if (userItem.online) {
-                initialOnlineUsers[userItem._id] = 'online';
-              }
-            });
-
-            
-            setOnlineUsers(initialOnlineUsers);
-
-
-
-             // Emit user online event
-        socket.emit('userOnline', user.id);
-
-        // Listen for user status updates
-        socket.on('updateUserStatus', ({ userId, status }) => {
-            setOnlineUsers((prev) => ({ ...prev, [userId]: status }));
-        });
-
-        
           } catch (error) {
             console.error('Error fetching users:', error);
           }
@@ -137,18 +148,19 @@ const Dashboard = () => {
         
         fetchUsers();
 
-        // Clean up socket connection on component unmount
-        return () => {
-          socket.disconnect();
-      };
 
       }, [user]);
-      
 
-     //fetching all messages of conversation
+
+
+
+
+
+
+     //<-------------fetching all messages of conversation------------------------------>
       const fetchMessages = async (conversationId, receiver) => {
         try {
-          const res = await fetch(`https://chit-chat-5-wnwg.onrender.com/api/message/${conversationId}?senderId=${user?.id}&receiverId=${receiver?.receiverId}`, {
+          const res = await fetch(`http://localhost:8000/api/message/${conversationId}?senderId=${user?.id}&receiverId=${receiver?.receiverId}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -164,7 +176,7 @@ const Dashboard = () => {
       
 
 
-    //sending messages
+      //<---------------------sending messages----------------------->
       const sendMessage = async (e) => {
         e.preventDefault();
         const senderId = user?.id;
@@ -178,7 +190,7 @@ const Dashboard = () => {
         try {
             // Check if the conversation ID is 'new'
             if (conversationId === 'new') {
-                const response = await fetch(`https://chit-chat-5-wnwg.onrender.com/api/conversations/check`, {
+                const response = await fetch(`http://localhost:8000/api/conversations/check`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -198,7 +210,6 @@ const Dashboard = () => {
                     conversationId: conversationId
                 }));
             }
-    
             // Send the message using socket
             socket?.emit('sendMessage', {
                 senderId,
@@ -208,7 +219,7 @@ const Dashboard = () => {
             });
     
             // Save the message to the database
-            await fetch(`https://chit-chat-5-wnwg.onrender.com/api/message`, {
+            await fetch(`http://localhost:8000/api/message`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -220,12 +231,12 @@ const Dashboard = () => {
                     receiverId
                 })
             });
+          
         } catch (error) {
             console.error('Error sending message:', error);
         }
     };
     
-
 
 
 
@@ -255,8 +266,7 @@ const Dashboard = () => {
     
 
 
-
-          {/*middle section ----------------- messages section */}
+{/*------------------------middle section ----------------- messages section------------------------ */}
           <div className='lg:w-1/2 w-full h-screen bg-orange-50  flex flex-col items-center overflow-scroll '>
             {messages?.receiver?.fullName && (
               <div className='w-11/12 lg:w-3/4 bg-secondary h-[80px] my-4 lg:my-14 rounded-full flex items-center px-6 lg:px-14 py-2'>
@@ -269,7 +279,6 @@ const Dashboard = () => {
 
                 </div>
                 <div className='cursor-pointer'>
-                <p className='text-sm font-light text-gray-600'>{onlineUsers[user?.id] === 'online' ? 'Online' : 'Offline'}</p>
                 </div>
               </div>
             )}
@@ -304,7 +313,9 @@ const Dashboard = () => {
     
 
 
-          {/* ----------message typing--------------  */}
+
+
+{/* ---------------------------message typing--------------  */}
 
             {messages?.receiver?.fullName && (
               <div className='p-16 lg:p-5 w-full flex items-center'>
@@ -333,7 +344,9 @@ const Dashboard = () => {
 
 
 
-          {/* right section */}
+
+
+          {/* <--------------------right section-------------------------> */}
           {/* People List */}
           <div className='lg:w-1/4 w-full h-screen bg-light px-4 lg:px-8 py-8 lg:py-16 overflow-scroll'>
             <div className='text-primary text-lg'>People</div>
@@ -342,6 +355,7 @@ const Dashboard = () => {
               {users.length > 0 ? (
   users.map(({ userId, user, conversationId }) => (
     <div key={userId} className='flex items-center py-4 lg:py-8 border-b border-b-gray-300'>
+      
       <div className='cursor-pointer flex items-center' onClick={() => fetchMessages(user.conversationId || 'new', user)}>
         <div>
           <img src={Img1} className="w-[60px] h-[60px] rounded-full p-[2px] border border-primary transform transition-transform duration-300 ease-in-out hover:scale-110" />
@@ -349,7 +363,13 @@ const Dashboard = () => {
         <div className='ml-6'>
           <h3 className='text-lg font-semibold'>{user?.fullName}</h3>
           <p className='text-sm font-light text-gray-600'>{user?.email}</p>
-          <p className='text-sm font-light text-gray-600'>{onlineUsers[user?.id] === 'online' ? 'Online' : 'Offline'}</p>
+          <div className='cursor-pointer'>
+                {/* <p className='text-sm font-light text-green-600'>{isUserOnline(user.id) ? 'Online' : 'Offline'}</p> */}
+                <p className={`text-sm font-light font-bold ${isUserOnline(user.id) ? 'text-green-600' : 'text-red-600'}`}>
+  {isUserOnline(user.id) ? 'Online' : 'Offline'}
+</p>
+          
+          </div>
         </div>
       </div>
     </div>

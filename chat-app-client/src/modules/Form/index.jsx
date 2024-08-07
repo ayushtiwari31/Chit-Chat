@@ -15,7 +15,7 @@ const Form = ({ isSignInPage = true }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = `https://chit-chat-5-wnwg.onrender.com/api/${isSignInPage ? 'login' : 'register'}`;
+    const url = `http://localhost:8000/api/${isSignInPage ? 'login' : 'register'}`;
 
     try {
       const response = await axios.post(url, data);

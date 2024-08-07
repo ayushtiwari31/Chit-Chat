@@ -16,12 +16,12 @@ const io = new SocketIOServer(server, {
         origin: 'http://localhost:5173',
     },
    
-    allowEIO3: true,
-
 });
-const PORT = process.env.SOCKET_PORT || 8080;
 
-server.listen(443, () => {
+
+const PORT =  8080;
+
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
@@ -37,22 +37,18 @@ import {Conversations} from './models/chat.model.js';
 
 
 
-let users = [];
-let onlineUsers={};
+
+
+
 
 // <<<-----------------------socket.io code start------------------------------->>>>
 
 
+let users = [];
+let onlineUsers = new Set();
 
 io.on('connection', socket => {
     console.log('User connected', socket.id);
-
-     // Handle user online event
-     socket.on('userOnline', async(userId) => {
-        onlineUsers[userId] = socket.id;
-        await Users.findByIdAndUpdate(userId, { online: true });
-        io.emit('updateUserStatus', { userId, status: 'online' });
-    });
 
     socket.on("connect_error", (err) => {
         console.log(`connect_error due to ${err.message}`);
@@ -64,9 +60,11 @@ io.on('connection', socket => {
             const user = { userId, socketId: socket.id };
             users.push(user);
             io.emit('getUsers', users);
+           
         }
     });
 
+    
     socket.on('sendMessage', async ({ senderId, receiverId, message, conversationId }) => {
         try {
             // If conversationId is 'new', find or create the conversation
@@ -119,16 +117,7 @@ io.on('connection', socket => {
         // Remove the user from the users array
         users = users.filter(user => user.socketId !== socket.id);
         io.emit('getUsers', users);
-    
-        // Remove the user from the onlineUsers object
-        for (const userId in onlineUsers) {
-            if (onlineUsers[userId] === socket.id) {
-                delete onlineUsers[userId];
-                await Users.findByIdAndUpdate(userId, { online: false });
-                io.emit('updateUserStatus', { userId, status: 'offline' });
-                break;
-            }
-        }
+        
     });
      
 });
@@ -374,7 +363,7 @@ app.get('/api/users/:userId', async (req, res) => {
         const userId = req.params.userId;
         const users = await Users.find({ _id: { $ne: userId } });
         const usersData = Promise.all(users.map(async (user) => {
-            return { user: { email: user.email, fullName: user.fullName, receiverId: user._id } }
+            return { user: { id:user._id,email: user.email, fullName: user.fullName, receiverId: user._id } }
         }))
         res.status(200).json(await usersData);
     } catch (error) {
