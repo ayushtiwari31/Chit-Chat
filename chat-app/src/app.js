@@ -10,12 +10,13 @@ import morgan from "morgan";
 
 const app = express();
 
-const server = http.createServer({ allowEIO3: true});
+const server = http.createServer();
 const io = new SocketIOServer(server, {
     cors: {
         origin: '*',
     },
     transports:['websocket','polling'],
+    allowEIO3: true,
 
 });
 const PORT = process.env.SOCKET_PORT || 8080;
