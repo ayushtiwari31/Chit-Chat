@@ -13,7 +13,7 @@ const app = express();
 const server = http.createServer();
 const io = new SocketIOServer(server, {
     cors: {
-        origin: '*',
+        origin: 'http://localhost:5173',
     },
    
     allowEIO3: true,
