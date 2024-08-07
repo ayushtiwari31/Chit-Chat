@@ -13,7 +13,7 @@ const app = express();
 const server = http.createServer();
 const io = new SocketIOServer(server, {
     cors: {
-        origin: 'http://localhost:5173',
+        origin: 'https://chit-chat-topaz.vercel.app',
     }
 });
 const PORT = 8080;

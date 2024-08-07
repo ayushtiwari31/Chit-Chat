@@ -27,7 +27,7 @@ const Dashboard = () => {
   const [userConversations, setUserConversations] = useState({});
 
 	useEffect(() => {
-		const socketInstance = io('http://localhost:8080');
+		const socketInstance = io('https://chit-chat-5-wnwg.onrender.com');
         setSocket(socketInstance);
 	}, [user])
 
@@ -51,7 +51,7 @@ const Dashboard = () => {
     const loggedInUser = JSON.parse(localStorage.getItem('user:detail'));
     
     const fetchConversations = async () => {
-      const res = await fetch(`http://localhost:8000/api/conversations/${loggedInUser?.id}`, {
+      const res = await fetch(`https://chit-chat-5-wnwg.onrender.com/api/conversations/${loggedInUser?.id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchUsers = async () => {
           try {
-            const res = await fetch(`http://localhost:8000/api/users/${user?.id}`, {
+            const res = await fetch(`https://chit-chat-5-wnwg.onrender.com/api/users/${user?.id}`, {
               method: 'GET',
               headers: {
                 'Content-Type': 'application/json',
@@ -140,7 +140,7 @@ const Dashboard = () => {
      //fetching all messages of conversation
       const fetchMessages = async (conversationId, receiver) => {
         try {
-          const res = await fetch(`http://localhost:8000/api/message/${conversationId}?senderId=${user?.id}&receiverId=${receiver?.receiverId}`, {
+          const res = await fetch(`https://chit-chat-5-wnwg.onrender.com/api/message/${conversationId}?senderId=${user?.id}&receiverId=${receiver?.receiverId}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -170,7 +170,7 @@ const Dashboard = () => {
         try {
             // Check if the conversation ID is 'new'
             if (conversationId === 'new') {
-                const response = await fetch(`http://localhost:8000/api/conversations/check`, {
+                const response = await fetch(`https://chit-chat-5-wnwg.onrender.com/api/conversations/check`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -200,7 +200,7 @@ const Dashboard = () => {
             });
     
             // Save the message to the database
-            await fetch(`http://localhost:8000/api/message`, {
+            await fetch(`https://chit-chat-5-wnwg.onrender.com/api/message`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
