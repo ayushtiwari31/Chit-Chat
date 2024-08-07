@@ -36,9 +36,7 @@ const Dashboard = () => {
     });
         setSocket(socketInstance);
 
-        return () => {
-          socketInstance.disconnect();
-      };
+       
 	}, [user])
 
 
