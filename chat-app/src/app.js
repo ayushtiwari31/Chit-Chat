@@ -18,7 +18,7 @@ const io = new SocketIOServer(server, {
     transports:['websocket','polling'],
 
 });
-const PORT = process.env.SOCKET_PORT || 3000;
+const PORT = process.env.SOCKET_PORT || 8080;
 
 server.listen(443, () => {
   console.log(`Server running on port ${PORT}`);
