@@ -13,12 +13,12 @@ const app = express();
 const server = http.createServer();
 const io = new SocketIOServer(server, {
     cors: {
-        origin: 'https://chit-chat-topaz.vercel.app',
+        origin: '*',
     }
 });
 const PORT = process.env.SOCKET_PORT || 3000;
 
-server.listen(PORT, () => {
+server.listen(443, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
