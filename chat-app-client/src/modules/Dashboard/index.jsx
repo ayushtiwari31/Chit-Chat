@@ -31,6 +31,10 @@ const Dashboard = () => {
       reconnection:true,
       transports:['websocket','polling'],
       reconnectionAttempts:5,
+      withCredentials: true,
+      extraHeaders: {
+        "my-custom-header": "abcd"
+      }
     });
         setSocket(socketInstance);
 
