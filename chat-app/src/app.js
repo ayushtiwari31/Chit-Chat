@@ -16,7 +16,7 @@ const io = new SocketIOServer(server, {
         origin: 'https://chit-chat-topaz.vercel.app',
     }
 });
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
