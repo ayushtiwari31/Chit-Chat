@@ -15,7 +15,7 @@ const io = new SocketIOServer(server, {
     cors: {
         origin: '*',
     },
-    transports:['websocket','polling'],
+   
     allowEIO3: true,
 
 });

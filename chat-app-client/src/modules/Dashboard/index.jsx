@@ -29,8 +29,6 @@ const Dashboard = () => {
 	useEffect(() => {
 		const socketInstance = io.connect('https://chit-chat-5-wnwg.onrender.com:8080',{
       reconnection:true,
-      transports:['websocket','polling'],
-      reconnectionAttempts:5,
       withCredentials: true,
       extraHeaders: {
         "my-custom-header": "abcd"
