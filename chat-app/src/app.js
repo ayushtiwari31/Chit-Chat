@@ -14,9 +14,11 @@ const server = http.createServer();
 const io = new SocketIOServer(server, {
     cors: {
         origin: 'https://chit-chat-topaz.vercel.app',
+        methods: ["GET", "POST"]
     }
 });
 const PORT = process.env.PORT || 8080;
+
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
