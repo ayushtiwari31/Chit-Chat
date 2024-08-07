@@ -14,7 +14,9 @@ const server = http.createServer();
 const io = new SocketIOServer(server, {
     cors: {
         origin: '*',
-    }
+    },
+    transports:['websocket','polling'],
+    
 });
 const PORT = process.env.SOCKET_PORT || 3000;
 
