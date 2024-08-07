@@ -5,6 +5,7 @@ Chit-Chat is a modern chatting application built using the MERN stack (MongoDB, 
 ## Features
 
 - **User Registration**: Create and manage user accounts.
+- **JWT Verification & Password hashing using Bcrypt**
 - **Real-Time Chat**: Engage in real-time conversations with friends.
 - **Responsive Design**: Beautiful and responsive UI with Tailwind CSS.
 
