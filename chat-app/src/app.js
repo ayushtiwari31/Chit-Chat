@@ -16,7 +16,7 @@ const io = new SocketIOServer(server, {
         origin: '*',
     },
     transports:['websocket','polling'],
-    
+
 });
 const PORT = process.env.SOCKET_PORT || 3000;
 
@@ -40,6 +40,11 @@ let users = [];
 let onlineUsers={};
 
 // <<<-----------------------socket.io code start------------------------------->>>>
+
+socket.on("connect_error", (err) => {
+    console.log(`connect_error due to ${err.message}`);
+  });
+  
 io.on('connection', socket => {
     console.log('User connected', socket.id);
 
