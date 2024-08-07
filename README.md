@@ -1,4 +1,4 @@
-# Chit-Chat
+# MERN FullStack Application - Chit-Chat
 
 Chit-Chat is a modern chatting application built using the MERN stack (MongoDB, Express.js, React, Node.js), Socket.IO, and Tailwind CSS. It allows users to register, log in, and chat with friends in real-time.
 
