@@ -27,7 +27,7 @@ const Dashboard = () => {
   const [userConversations, setUserConversations] = useState({});
 
 	useEffect(() => {
-		const socketInstance = io('https://chit-chat-5-wnwg.onrender.com:3000');
+		const socketInstance = io('https://chit-chat-5-wnwg.onrender.com:443');
         setSocket(socketInstance);
 
         return () => {
