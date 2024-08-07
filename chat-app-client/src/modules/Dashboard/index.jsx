@@ -29,6 +29,10 @@ const Dashboard = () => {
 	useEffect(() => {
 		const socketInstance = io('http://chit-chat-5-wnwg.onrender.com:3000');
         setSocket(socketInstance);
+
+        return () => {
+          socketInstance.disconnect();
+      };
 	}, [user])
 
 
