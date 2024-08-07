@@ -10,7 +10,7 @@ import morgan from "morgan";
 
 const app = express();
 
-const server = http.createServer();
+const server = http.createServer({ allowEIO3: true});
 const io = new SocketIOServer(server, {
     cors: {
         origin: '*',
@@ -41,10 +41,8 @@ let onlineUsers={};
 
 // <<<-----------------------socket.io code start------------------------------->>>>
 
-socket.on("connect_error", (err) => {
-    console.log(`connect_error due to ${err.message}`);
-  });
-  
+
+
 io.on('connection', socket => {
     console.log('User connected', socket.id);
 
@@ -54,6 +52,10 @@ io.on('connection', socket => {
         await Users.findByIdAndUpdate(userId, { online: true });
         io.emit('updateUserStatus', { userId, status: 'online' });
     });
+
+    socket.on("connect_error", (err) => {
+        console.log(`connect_error due to ${err.message}`);
+      });
 
     socket.on('addUser', userId => {
         const isUserExist = users.find(user => user.userId === userId);
